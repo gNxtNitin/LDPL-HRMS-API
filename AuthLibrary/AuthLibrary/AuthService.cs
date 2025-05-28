@@ -288,8 +288,10 @@ namespace AuthLibrary
                                 {
                                     string userRole = ds.Tables[0].Rows[0]["RoleName"].ToString();
                                     string uId = ds.Tables[0].Rows[0]["UserId"].ToString();
+                                    string employeeId = ds.Tables[0].Rows[0]["UserName"].ToString();
+                                    string fName = ds.Tables[0].Rows[0]["FirstName"].ToString();
                                     string jwtToken = await GenerateJwtToken(loginReq.MobileOrEmail, userRole, uId);
-                                    responseModel.data = new { token = jwtToken, userId = Convert.ToInt32(uId) };
+                                    responseModel.data = new { token = jwtToken, userId = uId, empId = employeeId, uName = fName, role=userRole};
                                     responseModel.code = res.Ret;
 
                                     if (res.Ret == 201)
