@@ -393,7 +393,7 @@ namespace PasswordManagementLibrary
 
 
                 ArrayList arrList = new ArrayList();
-                DALOR.spArgumentsCollection(arrList, "p_flag", "C", "CHAR", "I", 50);
+                DALOR.spArgumentsCollection(arrList, "p_flag", "C", "CHAR", "I", 1);
                 DALOR.spArgumentsCollection(arrList, "p_userid", req.MobileOrEmail, "CHAR", "I", 50);
                 DALOR.spArgumentsCollection(arrList, "p_tokenhash", token, "VARCHAR", "I");
 
@@ -434,12 +434,14 @@ namespace PasswordManagementLibrary
             {
                 ArrayList arrList = new ArrayList();
 
-                
-                DAL.spArgumentsCollection(arrList, "@flag", "V", "CHAR", "I");
-                DAL.spArgumentsCollection(arrList, "@TokenHash", tokenHash, "NVARCHAR", "I");
-                DAL.spArgumentsCollection(arrList, "@Ret", "", "INT", "O");
-                DAL.spArgumentsCollection(arrList, "@ErrorMsg", "", "VARCHAR", "O");
-                var res = DAL.RunStoredProcedureRetError("sp_SetValidatePasswordResetToken", arrList);
+                DALOR.spArgumentsCollection(arrList, "p_flag", "V", "CHAR", "I", 1);
+                DALOR.spArgumentsCollection(arrList, "p_userid", string.Empty, "CHAR", "I", 50);
+                DALOR.spArgumentsCollection(arrList, "p_tokenhash", tokenHash, "VARCHAR", "I");
+
+                DALOR.spArgumentsCollection(arrList, "@ret", "", "VARCHAR", "O");
+                DALOR.spArgumentsCollection(arrList, "@errormsg", "", "VARCHAR", "O");
+
+                var res = DALOR.RunStoredProcedureRetError("G_SP_SetValidatePasswordResetToken", arrList);
 
                 response.code = res.Ret;
                 response.msg = res.Ret > 0 ? "Valid token" : "Invalid token";
