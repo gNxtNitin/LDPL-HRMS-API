@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="UserAccessControlRepository.cs~RF10e26301.TMP" />
+    <None Remove="UserControlService.cs~RF11220133.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="References\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DatabaseManager\DatabaseManager\DatabaseManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DatabaseManager">
+      <HintPath>References\DatabaseManager.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

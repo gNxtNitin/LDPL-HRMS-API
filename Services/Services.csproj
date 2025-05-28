@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AdminManagementLibrary\MobilePortalManagementLibrary.csproj" />
+    <ProjectReference Include="..\AuditAndLoggingLibrary\AuditAndLoggingLibrary\AuditAndLoggingLibrary.csproj" />
+    <ProjectReference Include="..\AuthLibrary\AuthLibrary\AuthLibrary.csproj" />
+    <ProjectReference Include="..\CustomerManagementLibrary\CustomerManagementLibrary.csproj" />
+    <ProjectReference Include="..\DatabaseManager\DatabaseManager\DatabaseManager.csproj" />
+    <ProjectReference Include="..\EmailService.Library\EmailService.Library\EmailService.Library.csproj" />
+    <ProjectReference Include="..\ErrorAndExceptionHandling.Library\ErrorAndExceptionHandling.Library\ErrorAndExceptionHandling.Library.csproj" />
+    <ProjectReference Include="..\MenuManagementLib\MenuManagementLib\MenuManagementLib.csproj" />
+    <ProjectReference Include="..\ModelsLibrary\ModelsLibrary.csproj" />
+    <ProjectReference Include="..\NotificationPreferenceLib\NotificationPreferenceLib\NotificationPreferenceLib.csproj" />
+    <ProjectReference Include="..\NotificationSenderLib\NotificationSenderLib\NotificationSenderLib.csproj" />
+    <ProjectReference Include="..\PasswordLibrary\PasswordManagementLibrary\PasswordManagementLibrary.csproj" />
+    <ProjectReference Include="..\RoleManagementLibrary\RoleManagementLibrary\RoleManagementLibrary.csproj" />
+    <ProjectReference Include="..\UserManagementLibrary\UserManagementLibrary\UserManagementLibrary.csproj" />
+  </ItemGroup>
+
+</Project>

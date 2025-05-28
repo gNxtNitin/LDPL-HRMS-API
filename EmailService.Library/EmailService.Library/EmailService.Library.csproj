@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DatabaseManager\DatabaseManager\DatabaseManager.csproj" />
+    <ProjectReference Include="..\..\ModelsLibrary\ModelsLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DatabaseManager">
+      <HintPath>bin\Debug\net6.0\DatabaseManager.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Twilio" Version="7.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\UserManagementLibrary\UserManagementLibrary\UserManagementLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DatabaseManager">
+      <HintPath>..\..\..\DatabaseManagerNew\DatabaseManager\DatabaseManager\bin\Debug\net6.0\DatabaseManager.dll</HintPath>
+    </Reference>
+    <Reference Include="EmailService.Library">
+      <HintPath>..\..\..\Independent_Modules\EmailService.Library\EmailService.Library\bin\Debug\net6.0\EmailService.Library.dll</HintPath>
+    </Reference>
+    <Reference Include="NotificationPreferenceLib">
+      <HintPath>..\..\NotificationPreferenceLib\NotificationPreferenceLib\bin\Debug\net6.0\NotificationPreferenceLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
