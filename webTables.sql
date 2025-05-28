@@ -450,6 +450,184 @@ EXCEPTION
 END;
 /
 
+CREATE OR REPLACE PROCEDURE G_SP_GetSetEmailNotification (
+    p_flag          IN  CHAR,             -- 'C' = Set (insert), 'G' = Get by Token, 'U' - UPDATE
+    p_token         IN  VARCHAR2,
+    p_toemailids    IN  VARCHAR2 DEFAULT NULL,
+    p_subject       IN  VARCHAR2 DEFAULT NULL,
+    p_body          IN  CLOB DEFAULT NULL,
+    p_hasattachment IN Number Default 0,
+    P_issent        IN Number default 0,
+    p_status        IN CHAR default 'A',
+    p_ishtml        IN  NUMBER DEFAULT 0,
+    ret           OUT NUMBER,
+    errormsg      OUT VARCHAR2,
+    p_result        OUT SYS_REFCURSOR
+
+) AS
+BEGIN
+    ret := -1;
+    errormsg := '';
+
+    IF p_flag = 'C' THEN
+    
+       
+        INSERT INTO G_EmailNotification (
+            Token, ToEmailIds, EmailSubject, EmailBody,
+            HasAttachment, IsSent, CreatedDate, Status, IsHTML
+        ) VALUES (
+            p_token, p_toemailids, p_subject, p_body,
+            p_hasattachment, p_issent, SYSTIMESTAMP, p_status, p_ishtml
+        );
+
+        ret := 1;
+        errormsg := 'Reset token generated!';
+
+    ELSIF p_flag = 'G' THEN
+        OPEN p_result FOR
+            SELECT Token, ToEmailIds, EmailSubject, EmailBody,
+            HasAttachment, IsSent, CreatedDate, Status, IsHTML
+            FROM G_EmailNotification
+            WHERE Token = p_token AND IsSent = 0 AND STATUS = p_status AND  ToEmailIds IS NOT NULL AND LENGTH(TRIM(ToEmailIds)) > 0;
+
+        ret := 200;
+        
+    ELSIF p_flag = 'U' THEN
+        UPDATE G_EmailNotification
+        SET IsSent = p_issent, CreatedDate = SYSTIMESTAMP, Status = p_status
+        WHERE Token = p_token;
+    ELSE
+        errormsg := 'Invalid flag';
+        ret := -1;
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        errormsg := 'Unexpected error: ' || SQLERRM;
+        ret := -1;
+END G_SP_GetSetEmailNotification;
+/
+
+
+CREATE OR REPLACE PROCEDURE G_SP_SetValidatePasswordResetToken (
+    p_flag          IN  CHAR DEFAULT 'V',
+    P_userid        IN  VARCHAR2,
+    p_tokenhash     IN  VARCHAR2,
+    ret           OUT NUMBER,
+    errormsg      OUT VARCHAR2
+
+) AS
+    v_UserId               NUMBER;
+    v_UserName             VARCHAR2(50);
+    v_Email                VARCHAR2(100);
+    v_ExistingTokenTime    TIMESTAMP WITH TIME ZONE;
+    v_TokenExpiryMinutes   NUMBER;
+    v_IsValid              NUMBER := -1;
+    v_NowUTC               TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP AT TIME ZONE 'UTC';
+BEGIN
+    IF p_flag = 'C' THEN
+        BEGIN
+            -- Get active user ID
+            SELECT UserID, USERNAME, EMAIL
+            INTO v_UserId, v_UserName, v_Email
+            FROM G_Users
+            WHERE USERNAME = p_userid AND IsActive = 1
+            FETCH FIRST 1 ROWS ONLY;
+            
+            
+            IF v_Email is NULL or LENGTH(TRIM(v_Email)) =0 THEN
+                ret := -404;
+                errormsg := 'Email Not Found!';
+                RETURN;
+            END IF;
+
+            BEGIN
+                SELECT ExpirationTimeUTC INTO v_ExistingTokenTime
+                FROM G_PasswordResetTokens
+                WHERE USERNAME = v_UserName
+                FETCH FIRST 1 ROWS ONLY;
+
+                IF v_ExistingTokenTime IS NOT NULL AND 
+                   v_ExistingTokenTime > v_NowUTC - INTERVAL '60' MINUTE THEN
+                    ret := -2;
+                    errormsg := 'Reset token already generated in the last 1 hour';
+                    RETURN;
+                END IF;
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN
+                    NULL; -- No token found, continue
+            END;
+
+--            -- Get expiration duration
+--            SELECT ResetTokenExpiryMinutes
+--            INTO v_TokenExpiryMinutes
+--            FROM PasswordPolicy
+--            FETCH FIRST 1 ROWS ONLY;
+            
+            v_TokenExpiryMinutes:=60;
+
+            -- Insert new token using UTC timestamp
+            INSERT INTO G_PasswordResetTokens (
+                UserID,UserName, ResetTokenHash, ExpirationTimeUTC, IsUsed, CreatedDate
+            ) VALUES (
+                v_UserId,
+                v_UserName,
+                p_TokenHash,
+                v_NowUTC + INTERVAL '1' MINUTE * v_TokenExpiryMinutes,
+                0,
+                v_NowUTC
+            );
+
+            ret := v_UserId;
+            errormsg := v_Email;
+            
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                ret := -1;
+                errormsg := 'User is not found';
+            WHEN OTHERS THEN
+                ret := -9;
+                errormsg := 'Unexpected error (C): ' || SQLERRM;
+        END;
+
+    ELSIF p_flag = 'U' THEN
+        -- Mark token as used
+        UPDATE G_PasswordResetTokens
+        SET IsUsed = 1
+        WHERE ResetTokenHash = p_TokenHash;
+
+        ret := 200;
+
+    ELSIF p_flag = 'V' THEN
+        BEGIN
+            SELECT CASE 
+                     WHEN ExpirationTimeUTC > v_NowUTC AND IsUsed = 0 THEN 1 
+                     ELSE -1 
+                   END
+            INTO v_IsValid
+            FROM G_PasswordResetTokens
+            WHERE ResetTokenHash = p_TokenHash
+            FETCH FIRST 1 ROWS ONLY;
+
+            ret := v_IsValid;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                ret := -1;
+                errormsg := 'Token not found or expired';
+        END;
+
+    ELSE
+        ret := -1;
+        errormsg := 'Invalid request';
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        errormsg := 'Unexpected error: ' || SQLERRM;
+        ret := -99;
+END G_SP_SetValidatePasswordResetToken;
+/
+
 
 
 -- INSERT ROLES
