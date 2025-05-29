@@ -78,7 +78,7 @@ namespace MenuManagementLib
                 DALOR.spArgumentsCollection(arrList, "g_ResultSet", "", "REFCURSOR", "O");
 
                 DataSet ds = new DataSet();
-                var res = DALOR.RunStoredProcedureDsRetError("sp_GetSetMenu", arrList, ds);
+                var res = DALOR.RunStoredProcedureDsRetError("G_sp_GetSetMenu", arrList, ds);
 
                 responseModal.code = res.Ret;
                 responseModal.msg = res.ErrorMsg;

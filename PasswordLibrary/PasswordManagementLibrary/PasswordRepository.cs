@@ -404,18 +404,12 @@ namespace PasswordManagementLibrary
 
                 response.code = res.Ret;
                 response.msg = res.ErrorMsg;
-                string encTokenForUrl = await encDcService.Encrypt(string.Concat(token, "&", res.Ret.ToString()));
+                string encTokenForUrl = await encDcService.Encrypt(string.Concat(token, "&", req.MobileOrEmail));
 
                 response.data = response.code > 0 ? HttpUtility.UrlEncode(encTokenForUrl) : string.Empty;
 
-                if (response.code == -404)
-                {
-                    response.msg = "User Email not found.";
-                }
-                else
-                {
-                    response.msg = res.ErrorMsg;
-                }
+                response.msg = res.ErrorMsg;
+             
             }
 
             catch (Exception ex)
