@@ -91,6 +91,21 @@ EXCEPTION WHEN OTHERS THEN NULL;
 END;
 /
 
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE G_EMP_DA_BILLS CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE G_EMP_DA CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END;
+/
+
+
 
 COMMIT;
 
@@ -270,7 +285,7 @@ CREATE TABLE G_PasswordResetTokens (
         ON DELETE CASCADE
 );
 
-
+-- 12. Email Notifications 
 CREATE TABLE G_EmailNotification (
     ID              NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Token           VARCHAR2(255 CHAR),
@@ -285,6 +300,41 @@ CREATE TABLE G_EmailNotification (
     IsHTML          NUMBER(1) DEFAULT 0 CHECK (IsHTML IN (0, 1))
 );
 
+
+-- 13. DA records
+-- Create G_EMP_DA table
+CREATE TABLE G_EMP_DA (
+  DAID             VARCHAR2(36 BYTE) DEFAULT SYS_GUID() NOT NULL,
+  EMPID            VARCHAR2(100 BYTE) NOT NULL,
+  DA               NUMBER(10,2) NOT NULL,
+  HOTEL            NUMBER(10,2),
+  OTHER            NUMBER(10,2),
+  KM               NUMBER(10,2),
+  FROMDATE         DATE NOT NULL,
+  TODATE           DATE NOT NULL,
+  DASTATUS         CHAR(3 BYTE) DEFAULT 'NO',
+  ADDDATETIME      TIMESTAMP(6),
+  ARDATETIME       TIMESTAMP(6),
+  APPROVEREJECTBY  VARCHAR2(50 BYTE),
+  CONSTRAINT CHK_KM_NON_NEGATIVE CHECK (KM >= 0),
+  CONSTRAINT PK_G_EMP_DA PRIMARY KEY (DAID)
+);
+
+-- Create G_EMP_DA_BILLS table
+CREATE TABLE G_EMP_DA_BILLS (
+  BILL_ID         NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  DAID            VARCHAR2(36 BYTE) NOT NULL,
+  BILL_FILE_NAME  VARCHAR2(255 BYTE),
+  DESCRIPTION     VARCHAR2(4000 BYTE),
+  ADDEDDATE       DATE DEFAULT SYSDATE
+);
+
+-- Add foreign key constraint
+ALTER TABLE G_EMP_DA_BILLS
+ADD CONSTRAINT FK_G_EMP_DA_BILLS_DAID
+FOREIGN KEY (DAID)
+REFERENCES G_EMP_DA (DAID)
+ON DELETE CASCADE;
 
 COMMIT;
 
@@ -641,6 +691,98 @@ INSERT INTO G_ROLES(ROLENAME, DESCRIPTION, ISACTIVE, CREATEDBY, CREATEDDATE)
 VALUES ('CSR', 'For CSR (Rider) Role', 1, 0, SYSDATE);
 
 commit;
+
+
+CREATE OR REPLACE PROCEDURE G_SP_GetSetDailyEPunch(
+    p_flag        IN CHAR DEFAULT 'G',
+    p_empId       IN VARCHAR2,
+    p_lattitude   IN NUMBER,
+    p_longitude   IN NUMBER,
+    p_ephoto      IN VARCHAR2,
+    p_km          IN NUMBER,
+    p_address       IN VARCHAR2,
+    p_location    IN VARCHAR2,
+    p_schoolId      IN VARCHAR2,
+    p_isaddressmatched IN NUMBER,
+   
+    p_fromDate    IN DATE,
+    p_toDate      IN DATE,
+
+    ret           OUT VARCHAR2,
+    errormsg      OUT VARCHAR2,
+    o_dailyepunch OUT SYS_REFCURSOR
+)
+AS
+    v_cnt_e NUMBER;
+    v_cnt_s NUMBER;
+BEGIN
+    -- Check if employee and school exists
+    SELECT COUNT(*) INTO v_cnt_e FROM TBL_USERS WHERE EMPID = p_empId;
+    SELECT COUNT(*) INTO v_cnt_s FROM SCHOOL WHERE SCHOOL_CODE = p_schoolId;
+
+    IF p_flag = 'C' THEN
+        IF v_cnt_e > 0 AND v_cnt_s >0 THEN
+            INSERT INTO G_DAILY_EPUNCH(
+                EMPID, LATTITUDE, LONGITUDE, EPHOTO, PUNCHDATETIME, KM, ADDRESS, LOCATION, SCHOOLID, ISADDRESSMATCHED
+            ) 
+            VALUES (
+                p_empId, p_lattitude, p_longitude, p_ephoto, SYSDATE, p_km, p_address, p_location, p_schoolID, p_isaddressmatched
+            );
+
+            ret := '1';
+            errormsg := 'EPunch Record inserted successfully.';
+        ELSE
+           ret := '-1';
+           errormsg := 'Employe Or School not found.';
+        END IF;
+            
+        -- GET TODAY'S PUNCHES
+    ELSIF p_flag = 'G' THEN
+        OPEN o_dailyepunch FOR
+            SELECT EMPID, LATTITUDE, LONGITUDE, EPHOTO, PUNCHDATETIME, KM, ADDRESS, LOCATION
+            FROM G_DAILY_EPUNCH
+            WHERE EMPID = p_empId
+            AND TRUNC(PUNCHDATETIME) = TRUNC(SYSDATE)
+            ORDER BY PUNCHDATETIME;
+
+        ret := '1';
+        errormsg := 'Punch records retrieved successfully.';
+            
+    -- GET TOTAL KM IN DATE RANGE
+    ELSIF p_flag = 'F' THEN
+            
+       OPEN o_dailyepunch FOR
+        SELECT p_empId AS EMPID,
+               COALESCE((
+                   SELECT SUM(KM)
+                   FROM G_DAILY_EPUNCH
+                   WHERE EMPID = p_empId
+                     AND TRUNC(PUNCHDATETIME) BETWEEN TRUNC(p_fromDate) AND TRUNC(p_toDate)
+               ), 0) AS TOTAL_KM
+        FROM DUAL;
+
+            ret := '1';
+            errormsg := 'Total KM calculated successfully.';
+    
+    -- GET ASSIGNED SCHOOLS OF THE EMP
+    ELSIF p_flag = 'S' THEN
+        OPEN o_dailyepunch FOR
+            SELECT SCHOOL_CODE AS SCODE, SCHOOL_NAME AS SNAME, (SADDRESS || ', ' || CITY || ', ' || STATE) AS ADDRESS FROM SCHOOL WHERE EMPID = p_empId;
+        ret := '1';
+        errormsg := 'success';
+    ELSE
+        ret := '-1';
+        errormsg := 'Invalid flag.';
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ret := '-1';
+        errormsg := 'Unexpected error: ' || SQLERRM;
+END;
+/
+
+
 
 
 -- For testing purpose: dummy users

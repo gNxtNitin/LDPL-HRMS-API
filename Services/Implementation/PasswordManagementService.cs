@@ -48,7 +48,7 @@ namespace Services.Implementation
                         "<p>Stay smart, stay secure!</p>" +
                         "<p>Best regards,<br>Moduler Architect Team</p>" +
                         "</body>" +
-                        "</html>", string.Concat(webHostUrl, "?authResetToken=", response.data.ToString())),
+                        "</html>", string.Concat(webHostUrl, "/auth/resetpassword?authResetToken=", response.data.ToString())),
 
                     subject = "Password Reset",
                     ToEmailIds = response.msg
