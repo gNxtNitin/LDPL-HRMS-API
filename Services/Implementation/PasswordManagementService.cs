@@ -12,6 +12,8 @@ using EmailService.Library;
 using ModelsLibrary.Models;
 using PasswordManagementLibrary.Models;
 using AuthLibrary.Models;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 //using UserManagementLibrary.Models;
 
 namespace Services.Implementation
@@ -37,6 +39,29 @@ namespace Services.Implementation
             bool isSent = false;
             if (response.code > 0)
             {
+                string email = response.msg;
+
+                if(string.IsNullOrEmpty(email) || string.IsNullOrWhiteSpace(email))
+                {
+                    response.code = -404;
+                    response.msg = "Email address Not Found!";
+                    response.data = null;
+                    return response;
+                }
+                
+                Regex EmailRegex = new Regex(@"^[A-Za-z0-9]+([._%+-]?[A-Za-z0-9]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$",
+                                RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                bool isValid = EmailRegex.IsMatch(email);
+                
+                if(!isValid)
+                {
+                    response.code = -400;
+                    response.msg = "Invalid email address";
+                    response.data = null;
+
+                    return response;
+                }
+
                 await _emailSerivce.QueueEmail(new EmailConfiguration(), new EmailDetails()
                 {
                     body = string.Format(@"<html>" +
@@ -55,11 +80,12 @@ namespace Services.Implementation
 
                 });
 
+
+                response.data = new { token = response.data, toEmail = response.msg };
                 response.msg = "Reset Password Email Sent";
+             
             }
            
-            
-
             return response;
 
         }

@@ -407,9 +407,6 @@ namespace PasswordManagementLibrary
                 string encTokenForUrl = await encDcService.Encrypt(string.Concat(token, "&", req.MobileOrEmail));
 
                 response.data = response.code > 0 ? HttpUtility.UrlEncode(encTokenForUrl) : string.Empty;
-
-                response.msg = res.ErrorMsg;
-             
             }
 
             catch (Exception ex)
