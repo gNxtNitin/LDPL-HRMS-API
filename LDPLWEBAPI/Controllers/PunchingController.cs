@@ -8,7 +8,7 @@ using LDPLWEBAPI.Models;
 
 namespace LDPLWEBAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PunchingController : ControllerBase
@@ -96,7 +96,7 @@ namespace LDPLWEBAPI.Controllers
                     Longitude = ePunchModel.Longitude ?? 0,
                     FileName = savedFileName ?? string.Empty,
                     KM = ePunchModel.KM ?? 0,
-                    SchoolId = ePunchModel.SchoolId,
+                    //SchoolId = ePunchModel.SchoolId,
                     Location = ePunchModel.Location ?? string.Empty,
                     Address = ePunchModel.Address ?? string.Empty
                 };

@@ -118,7 +118,8 @@ namespace MobilePortalManagementLibrary.Implementation
                 DALOR.spArgumentsCollection(arrList, "p_km", "0", "NUMBER", "I");
                 DALOR.spArgumentsCollection(arrList, "p_address", "", "VARCHAR", "I");
                 DALOR.spArgumentsCollection(arrList, "p_location", "", "VARCHAR", "I");
-                DALOR.spArgumentsCollection(arrList, "p_schoolId", "", "VARCHAR", "I");
+                //DALOR.spArgumentsCollection(arrList, "p_schoolId", "", "VARCHAR", "I");
+                DALOR.spArgumentsCollection(arrList, "p_isaddressmatched", "0", "NUMBER", "I");
                 DALOR.spArgumentsCollection(arrList, "p_fromDate", fromDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), "DATE", "I");
                 DALOR.spArgumentsCollection(arrList, "p_toDate", toDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), "DATE", "I");
 

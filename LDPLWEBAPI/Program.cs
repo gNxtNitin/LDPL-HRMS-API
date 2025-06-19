@@ -79,6 +79,8 @@ builder.Services.AddScoped<IPunchingManagementService, PunchingManagementService
 builder.Services.AddScoped<IDAService, DAService>();
 builder.Services.AddScoped<IVisitService, VisitService>();
 builder.Services.AddScoped<IPunchingService, PunchingService>();
+builder.Services.AddScoped<ILeaveManagementService, LeaveManagemenrService>();
+builder.Services.AddScoped<ILeaveService, LeaveService>();
 
 
 builder.Services.AddScoped<IErrorLoggingService>(sp =>

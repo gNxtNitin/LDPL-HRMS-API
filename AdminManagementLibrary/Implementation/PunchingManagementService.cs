@@ -27,7 +27,8 @@ namespace MobilePortalManagementLibrary.Implementation
                 DALOR.spArgumentsCollection(arrList, "p_km", ePunchRequestModel.KM.ToString(), "NUMBER", "I");
                 DALOR.spArgumentsCollection(arrList, "p_address", ePunchRequestModel.Address, "VARCHAR", "I");
                 DALOR.spArgumentsCollection(arrList, "p_location", ePunchRequestModel.Location, "VARCHAR", "I");
-                DALOR.spArgumentsCollection(arrList, "p_schoolId", ePunchRequestModel.SchoolId, "VARCHAR", "I");
+                //DALOR.spArgumentsCollection(arrList, "p_schoolId", ePunchRequestModel.SchoolId, "VARCHAR", "I");
+                DALOR.spArgumentsCollection(arrList, "p_isaddressmatched", ePunchRequestModel.IsAddressMatched ? "1" : "0", "NUMBER", "I");
                 DALOR.spArgumentsCollection(arrList, "p_fromDate", string.Empty, "VARCHAR", "I");
                 DALOR.spArgumentsCollection(arrList, "p_toDate", string.Empty, "VARCHAR", "I");
                
@@ -116,7 +117,8 @@ namespace MobilePortalManagementLibrary.Implementation
                 DALOR.spArgumentsCollection(arrList, "p_km", "0", "NUMBER", "I");
                 DALOR.spArgumentsCollection(arrList, "p_address", "", "VARCHAR", "I");
                 DALOR.spArgumentsCollection(arrList, "p_location", "", "VARCHAR", "I");
-                DALOR.spArgumentsCollection(arrList, "p_schoolId", "", "VARCHAR", "I");
+                //DALOR.spArgumentsCollection(arrList, "p_schoolId", "", "VARCHAR", "I");
+                DALOR.spArgumentsCollection(arrList, "p_isaddressmatched", "0", "NUMBER", "I");
                 DALOR.spArgumentsCollection(arrList, "p_fromDate", string.Empty, "VARCHAR", "I");
                 DALOR.spArgumentsCollection(arrList, "p_toDate", string.Empty, "VARCHAR", "I");
 

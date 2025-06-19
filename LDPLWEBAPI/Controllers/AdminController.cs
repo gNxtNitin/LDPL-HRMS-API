@@ -1,10 +1,11 @@
-﻿using MobilePortalManagementLibrary.Models;
+﻿using LDPLWEBAPI.Utility;
+using Microsoft.AspNetCore.Authorization;
 //using CustomerManagementLibrary.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MobilePortalManagementLibrary.Models;
 using Services.Implementation;
 using Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 
 namespace LDPLWEBAPI.Controllers
 {
@@ -14,6 +15,7 @@ namespace LDPLWEBAPI.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
+        private readonly EncryptDecryptClass encDcService = new EncryptDecryptClass();
         public AdminController(IAdminService adminService)
         {
             _adminService = adminService;
@@ -157,6 +159,10 @@ namespace LDPLWEBAPI.Controllers
         {
             try
             {
+                if (!string.IsNullOrEmpty(erm.Password))
+                {
+                    erm.Password = await encDcService.Encrypt(erm.Password);
+                }
                 //List<Menu> menuList = new List<Menu>();
                 var res = await _adminService.GetCreateUpdateDeleteEmployees(erm);
                 return Ok(res);

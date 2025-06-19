@@ -16,6 +16,7 @@ namespace MobilePortalManagementLibrary.Models
         public string SchoolId { get; set; }
         public string Location { get; set; }
         public string Address { get; set; }
+        public bool IsAddressMatched { get; set; }
 
     }
 }

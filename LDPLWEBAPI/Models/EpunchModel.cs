@@ -9,7 +9,7 @@ namespace LDPLWEBAPI.Models
         public float? Latitude { get; set; }
         public float? Longitude { get; set; }
         public float? KM { get; set; }
-        public string SchoolId { get; set; }
+        //public string SchoolId { get; set; }
         public string? Location { get; set; }
         public string? Address { get; set; }
         public IFormFile? EPhoto { get; set; }
